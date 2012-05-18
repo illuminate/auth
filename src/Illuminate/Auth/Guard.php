@@ -19,6 +19,13 @@ abstract class Guard {
 	public function attempt(array $credentials = array())
 	{
 		$user = $this->retrieveUserByCredentials($credentials);
+
+		if ($user instanceof UserInterface)
+		{
+			return $user;
+		}
+
+		return false;
 	}
 
 }
