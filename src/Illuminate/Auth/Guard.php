@@ -10,7 +10,7 @@ abstract class Guard {
 	 * @param  mixed  $identifier
 	 * @return Illuminate\Auth\UserInterface|null
 	 */
-	abstract protected function retrieveUserByIdentifier($identifier);
+	abstract protected function retrieveUserByID($identifier);
 
 	/**
 	 * Retrieve a user by the given credentials.
@@ -21,15 +21,40 @@ abstract class Guard {
 	abstract protected function retrieveUserByCredentials(array $credentials);
 
 	/**
+	 * Determine if the current user is authenticated.
+	 *
+	 * @return bool
+	 */
+	public function isAuthed()
+	{
+		return ! is_null($this->user());
+	}
+
+	/**
+	 * Determine if the current user is a guest.
+	 *
+	 * @return bool
+	 */
+	public function isGuest()
+	{
+		return is_null($this->user());
+	}
+
+	/**
 	 * Get the currently authenticated user.
 	 *
-	 * @return Illuminate\Auth\UserInterface
+	 * @return Illuminate\Auth\UserInterface|null
 	 */
 	public function user()
 	{
 		if ( ! is_null($this->user)) return $this->user;
 
-		//
+		$id = $this->getSession()->get($this->getName());
+
+		if ( ! is_null($id))
+		{
+			return $this->user = $this->retrieveUserByID($id);
+		}
 	}
 
 	/**

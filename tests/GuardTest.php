@@ -50,7 +50,7 @@ class GuardTest extends PHPUnit_Framework_TestCase {
 
 	protected function getGuard($stub = array())
 	{
-		$stub = array_merge(array('retrieveUserByCredentials', 'retrieveUserByIdentifier'), (array) $stub);
+		$stub = array_merge(array('retrieveUserByCredentials', 'retrieveUserByID'), (array) $stub);
 
 		return $this->getMock('Illuminate\Auth\Guard', $stub);
 	}
