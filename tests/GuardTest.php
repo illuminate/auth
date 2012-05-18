@@ -12,38 +12,38 @@ class GuardTest extends PHPUnit_Framework_TestCase {
 
 	public function testAttemptCallsRetrieveByCredentials()
 	{
-		$mock = $this->getGuard();
-		$mock->expects($this->once())->method('retrieveUserByCredentials')->with($this->equalTo(array('foo')));
-		$mock->attempt(array('foo'));
+		$guard = $this->getGuard();
+		$guard->getProvider()->shouldReceive('retrieveByCredentials')->once()->with(array('foo'));
+		$guard->attempt(array('foo'));
 	}
 
 
 	public function testAttemptReturnsUserInterface()
 	{
-		$mock = $this->getGuard();
+		$guard = $this->getGuard();
 		$user = $this->getMock('Illuminate\Auth\UserInterface');
-		$mock->expects($this->once())->method('retrieveUserByCredentials')->will($this->returnValue($user));
-		$this->assertEquals($user, $mock->attempt(array('foo')));
+		$guard->getProvider()->shouldReceive('retrieveByCredentials')->once()->andReturn($user);
+		$this->assertEquals($user, $guard->attempt(array('foo')));
 	}
 
 
 	public function testAttemptReturnsFalseIfUserNotGiven()
 	{
 		$mock = $this->getGuard();
-		$mock->expects($this->once())->method('retrieveUserByCredentials')->will($this->returnValue('foo'));
+		$mock->getProvider()->shouldReceive('retrieveByCredentials')->once()->andReturn('foo');
 		$this->assertFalse($mock->attempt(array('foo')));
 	}
 
 
 	public function testLoginStoresIdentifierInSession()
 	{
-		$mock = $this->getGuard('getName');
+		$provider = m::mock('Illuminate\Auth\UserProviderInterface');
+		$session = m::mock('Illuminate\Session\Store');
+		$mock = $this->getMock('Illuminate\Auth\Guard', array('getName'), array($provider, $session));
 		$user = m::mock('Illuminate\Auth\UserInterface');
 		$mock->expects($this->once())->method('getName')->will($this->returnValue('foo'));
 		$user->shouldReceive('getIdentifier')->once()->andReturn('bar');
-		$session = m::mock('Illuminate\Session\Store');
-		$session->shouldReceive('put')->with('foo', 'bar')->once();
-		$mock->setSession($session);
+		$mock->getSession()->shouldReceive('put')->with('foo', 'bar')->once();
 		$mock->login($user);
 	}
 
@@ -60,7 +60,9 @@ class GuardTest extends PHPUnit_Framework_TestCase {
 
 	public function testIsAuthedReturnsFalseWhenUserIsNull()
 	{
-		$mock = $this->getGuard('user');
+		$provider = m::mock('Illuminate\Auth\UserProviderInterface');
+		$session = m::mock('Illuminate\Session\Store');
+		$mock = $this->getMock('Illuminate\Auth\Guard', array('user'), array($provider, $session));
 		$mock->expects($this->exactly(2))->method('user')->will($this->returnValue(null));
 		$this->assertFalse($mock->isAuthed());
 		$this->assertTrue($mock->isGuest());
@@ -79,9 +81,7 @@ class GuardTest extends PHPUnit_Framework_TestCase {
 	public function testNullIsReturnedForUserIfNoUserFound()
 	{
 		$mock = $this->getGuard();
-		$session = m::mock('Illuminate\Session\Store');
-		$session->shouldReceive('get')->once()->andReturn(null);
-		$mock->setSession($session);
+		$mock->getSession()->shouldReceive('get')->once()->andReturn(null);
 		$this->assertNull($mock->user());
 	}
 
@@ -89,11 +89,9 @@ class GuardTest extends PHPUnit_Framework_TestCase {
 	public function testUserIsSetToRetrievedUser()
 	{
 		$mock = $this->getGuard();
-		$session = m::mock('Illuminate\Session\Store');
-		$session->shouldReceive('get')->once()->andReturn(1);
-		$mock->setSession($session);
+		$mock->getSession()->shouldReceive('get')->once()->andReturn(1);
 		$user = m::mock('Illuminate\Auth\UserInterface');
-		$mock->expects($this->once())->method('retrieveUserByID')->with($this->equalTo(1))->will($this->returnValue($user));
+		$mock->getProvider()->shouldReceive('retrieveByID')->once()->with(1)->andReturn($user);
 		$this->assertEquals($user, $mock->user());
 		$this->assertEquals($user, $mock->getUser());
 	}
@@ -101,23 +99,23 @@ class GuardTest extends PHPUnit_Framework_TestCase {
 
 	public function testLogoutRemovesSessionToken()
 	{
-		$user = m::mock('Illuminate\Auth\UserInterface');
-		$mock = $this->getGuard('getName');
-		$mock->expects($this->once())->method('getName')->will($this->returnValue('foo'));
+		$provider = m::mock('Illuminate\Auth\UserProviderInterface');
 		$session = m::mock('Illuminate\Session\Store');
-		$session->shouldReceive('forget')->once()->with('foo');
-		$mock->setSession($session);
+		$mock = $this->getMock('Illuminate\Auth\Guard', array('getName'), array($provider, $session));
+		$user = m::mock('Illuminate\Auth\UserInterface');
+		$mock->expects($this->once())->method('getName')->will($this->returnValue('foo'));
+		$mock->getSession()->shouldReceive('forget')->once()->with('foo');
 		$mock->setUser($user);
 		$mock->logout();
 		$this->assertNull($mock->getUser());
 	}
 
 
-	protected function getGuard($stub = array())
+	protected function getGuard()
 	{
-		$stub = array_merge(array('retrieveUserByCredentials', 'retrieveUserByID'), (array) $stub);
-
-		return $this->getMock('Illuminate\Auth\Guard', $stub);
+		$session = m::mock('Illuminate\Session\Store');
+		$provider = m::mock('Illuminate\Auth\UserProviderInterface');
+		return new Illuminate\Auth\Guard($provider, $session);
 	}
 
 }

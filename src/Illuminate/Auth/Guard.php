@@ -2,7 +2,7 @@
 
 use Illuminate\Session\Store as SessionStore;
 
-abstract class Guard {
+class Guard {
 
 	/**
 	 * The currently authenticated user.
@@ -12,6 +12,13 @@ abstract class Guard {
 	protected $user;
 
 	/**
+	 * The user provider implementation.
+	 *
+	 * @var Illuminate\Auth\UserProviderInterface
+	 */
+	protected $provider;
+
+	/**
 	 * The session store used by the guard.
 	 *
 	 * @var Illuminate\Session\Store
@@ -19,20 +26,17 @@ abstract class Guard {
 	protected $session;
 
 	/**
-	 * Retrieve a user by their unique idenetifier.
+	 * Create a new authentication guard.
 	 *
-	 * @param  mixed  $identifier
-	 * @return Illuminate\Auth\UserInterface|null
+	 * @param  Illuminate\Auth\UserProviderInterface  $provider
+	 * @param  Illuminate\Session\Store               $session
+	 * @return void
 	 */
-	abstract protected function retrieveUserByID($identifier);
-
-	/**
-	 * Retrieve a user by the given credentials.
-	 *
-	 * @param  array  $credentials
-	 * @return Illuminate\Auth\UserInterface|null
-	 */
-	abstract protected function retrieveUserByCredentials(array $credentials);
+	public function __construct(UserProviderInterface $provider, SessionStore $session)
+	{
+		$this->session = $session;
+		$this->provider = $provider;
+	}
 
 	/**
 	 * Determine if the current user is authenticated.
@@ -63,11 +67,11 @@ abstract class Guard {
 	{
 		if ( ! is_null($this->user)) return $this->user;
 
-		$id = $this->getSession()->get($this->getName());
+		$id = $this->session->get($this->getName());
 
 		if ( ! is_null($id))
 		{
-			return $this->user = $this->retrieveUserByID($id);
+			return $this->user = $this->provider->retrieveByID($id);
 		}
 	}
 
@@ -79,7 +83,7 @@ abstract class Guard {
 	 */
 	public function attempt(array $credentials = array())
 	{
-		$user = $this->retrieveUserByCredentials($credentials);
+		$user = $this->provider->retrieveByCredentials($credentials);
 
 		if ($user instanceof UserInterface)
 		{
@@ -97,7 +101,7 @@ abstract class Guard {
 	 */
 	public function login(UserInterface $user)
 	{
-		$this->getSession()->put($this->getName(), $user->getIdentifier());
+		$this->session->put($this->getName(), $user->getIdentifier());
 
 		$this->user = $user;
 	}
@@ -109,7 +113,7 @@ abstract class Guard {
 	 */
 	public function logout()
 	{
-		$this->getSession()->forget($this->getName());
+		$this->session->forget($this->getName());
 
 		$this->user = null;
 	}
@@ -121,23 +125,17 @@ abstract class Guard {
 	 */
 	public function getSession()
 	{
-		if ( ! isset($this->session))
-		{
-			throw new \RuntimeException("No session instance set on guard.");
-		}
-
 		return $this->session;
 	}
 
 	/**
-	 * Set the session store to be used by the guard.
+	 * Get the user provider used by the guard.
 	 *
-	 * @param  Illuminate\Session\Store
-	 * @return void
+	 * @return Illuminate\Auth\UserProviderInterface
 	 */
-	public function setSession(SessionStore $session)
+	public function getProvider()
 	{
-		$this->session = $session;
+		return $this->provider;
 	}
 
 	/**
