@@ -29,7 +29,7 @@ class GuardTest extends PHPUnit_Framework_TestCase {
 
 	protected function getGuard()
 	{
-		return $this->getMock('Illuminate\Auth\Guard', array('retrieveUserByCredentials'));
+		return $this->getMock('Illuminate\Auth\Guard', array('retrieveUserByCredentials', 'retrieveUserByIdentifier'));
 	}
 
 }

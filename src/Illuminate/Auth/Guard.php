@@ -3,6 +3,14 @@
 abstract class Guard {
 
 	/**
+	 * Retrieve a user by their unique idenetifier.
+	 *
+	 * @param  mixed  $identifier
+	 * @return Illuminate\Auth\UserInterface|null
+	 */
+	abstract protected function retrieveUserByIdentifier($identifier);
+
+	/**
 	 * Retrieve a user by the given credentials.
 	 *
 	 * @param  array  $credentials
