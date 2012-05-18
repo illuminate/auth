@@ -43,7 +43,8 @@ class GuardTest extends PHPUnit_Framework_TestCase {
 		$user->shouldReceive('getIdentifier')->once()->andReturn('bar');
 		$session = m::mock('Illuminate\Session\Store');
 		$session->shouldReceive('put')->with('foo', 'bar')->once();
-		$mock->login($session, $user);
+		$mock->setSession($session);
+		$mock->login($user);
 	}
 
 

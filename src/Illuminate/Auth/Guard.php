@@ -21,6 +21,18 @@ abstract class Guard {
 	abstract protected function retrieveUserByCredentials(array $credentials);
 
 	/**
+	 * Get the currently authenticated user.
+	 *
+	 * @return Illuminate\Auth\UserInterface
+	 */
+	public function user()
+	{
+		if ( ! is_null($this->user)) return $this->user;
+
+		//
+	}
+
+	/**
 	 * Attempt to authenticate a user using the given credentials.
 	 *
 	 * @param  array  $credentials
@@ -41,15 +53,40 @@ abstract class Guard {
 	/**
 	 * Log a user into the application.
 	 *
-	 * @param  Illuminate\Session\Store       $session
 	 * @param  Illuminate\Auth\UserInterface  $user
 	 * @return void
 	 */
-	public function login(SessionStore $session, UserInterface $user)
+	public function login(UserInterface $user)
 	{
-		$session->put($this->getName(), $user->getIdentifier());
+		$this->getSession()->put($this->getName(), $user->getIdentifier());
 
 		$this->user = $user;
+	}
+
+	/**
+	 * Get the session store used by the guard.
+	 *
+	 * @return Illuminate\Session\Store
+	 */
+	public function getSession()
+	{
+		if ( ! isset($this->session))
+		{
+			throw new \RuntimeException("No session instance set on guard.");
+		}
+
+		return $this->session;
+	}
+
+	/**
+	 * Set the session store to be used by the guard.
+	 *
+	 * @param  Illuminate\Session\Store
+	 * @return void
+	 */
+	public function setSession(SessionStore $session)
+	{
+		$this->session = $session;
 	}
 
 	/**
