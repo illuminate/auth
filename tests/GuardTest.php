@@ -19,6 +19,14 @@ class GuardTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testAttemptReturnsFalseIfUserNotGiven()
+	{
+		$mock = $this->getGuard();
+		$mock->expects($this->once())->method('retrieveUserByCredentials')->will($this->returnValue('foo'));
+		$this->assertFalse($mock->attempt(array('foo')));
+	}
+
+
 	protected function getGuard()
 	{
 		return $this->getMock('Illuminate\Auth\Guard', array('retrieveUserByCredentials'));
