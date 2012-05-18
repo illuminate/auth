@@ -1,5 +1,7 @@
 <?php namespace Illuminate\Auth;
 
+use Illuminate\Session\Store as SessionStore;
+
 abstract class Guard {
 
 	/**
@@ -34,6 +36,30 @@ abstract class Guard {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Log a user into the application.
+	 *
+	 * @param  Illuminate\Session\Store       $session
+	 * @param  Illuminate\Auth\UserInterface  $user
+	 * @return void
+	 */
+	public function login(SessionStore $session, UserInterface $user)
+	{
+		$session->put($this->getName(), $user->getIdentifier());
+
+		$this->user = $user;
+	}
+
+	/**
+	 * Get a unique identifier for the auth session value.
+	 *
+	 * @return string
+	 */
+	protected function getName()
+	{
+		return 'login_'.md5(get_class($this));
 	}
 
 }

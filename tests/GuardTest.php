@@ -1,6 +1,14 @@
 <?php
 
+use Mockery as m;
+
 class GuardTest extends PHPUnit_Framework_TestCase {
+
+	public function tearDown()
+	{
+		m::close();
+	}
+
 
 	public function testAttemptCallsRetrieveByCredentials()
 	{
@@ -27,9 +35,23 @@ class GuardTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	protected function getGuard()
+	public function testLoginStoresIdentifierInSession()
 	{
-		return $this->getMock('Illuminate\Auth\Guard', array('retrieveUserByCredentials', 'retrieveUserByIdentifier'));
+		$mock = $this->getGuard('getName');
+		$user = m::mock('Illuminate\Auth\UserInterface');
+		$mock->expects($this->once())->method('getName')->will($this->returnValue('foo'));
+		$user->shouldReceive('getIdentifier')->once()->andReturn('bar');
+		$session = m::mock('Illuminate\Session\Store');
+		$session->shouldReceive('put')->with('foo', 'bar')->once();
+		$mock->login($session, $user);
+	}
+
+
+	protected function getGuard($stub = array())
+	{
+		$stub = array_merge(array('retrieveUserByCredentials', 'retrieveUserByIdentifier'), (array) $stub);
+
+		return $this->getMock('Illuminate\Auth\Guard', $stub);
 	}
 
 }
