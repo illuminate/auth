@@ -101,12 +101,15 @@ class GuardTest extends PHPUnit_Framework_TestCase {
 
 	public function testLogoutRemovesSessionToken()
 	{
+		$user = m::mock('Illuminate\Auth\UserInterface');
 		$mock = $this->getGuard('getName');
 		$mock->expects($this->once())->method('getName')->will($this->returnValue('foo'));
 		$session = m::mock('Illuminate\Session\Store');
 		$session->shouldReceive('forget')->once()->with('foo');
 		$mock->setSession($session);
+		$mock->setUser($user);
 		$mock->logout();
+		$this->assertNull($mock->getUser());
 	}
 
 
