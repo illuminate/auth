@@ -103,6 +103,18 @@ abstract class Guard {
 	}
 
 	/**
+	 * Log the user out of the application.
+	 *
+	 * @return void
+	 */
+	public function logout()
+	{
+		$this->getSession()->forget($this->getName());
+
+		$this->user = null;
+	}
+
+	/**
 	 * Get the session store used by the guard.
 	 *
 	 * @return Illuminate\Session\Store
