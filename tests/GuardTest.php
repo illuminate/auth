@@ -67,6 +67,38 @@ class GuardTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testUserMethodReturnsCachedUser()
+	{
+		$user = m::mock('Illuminate\Auth\UserInterface');
+		$mock = $this->getGuard();
+		$mock->setUser($user);
+		$this->assertEquals($user, $mock->user());
+	}
+
+
+	public function testNullIsReturnedForUserIfNoUserFound()
+	{
+		$mock = $this->getGuard();
+		$session = m::mock('Illuminate\Session\Store');
+		$session->shouldReceive('get')->once()->andReturn(null);
+		$mock->setSession($session);
+		$this->assertNull($mock->user());
+	}
+
+
+	public function testUserIsSetToRetrievedUser()
+	{
+		$mock = $this->getGuard();
+		$session = m::mock('Illuminate\Session\Store');
+		$session->shouldReceive('get')->once()->andReturn(1);
+		$mock->setSession($session);
+		$user = m::mock('Illuminate\Auth\UserInterface');
+		$mock->expects($this->once())->method('retrieveUserByID')->with($this->equalTo(1))->will($this->returnValue($user));
+		$this->assertEquals($user, $mock->user());
+		$this->assertEquals($user, $mock->getUser());
+	}
+
+
 	protected function getGuard($stub = array())
 	{
 		$stub = array_merge(array('retrieveUserByCredentials', 'retrieveUserByID'), (array) $stub);

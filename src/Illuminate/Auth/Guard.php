@@ -129,6 +129,16 @@ abstract class Guard {
 	}
 
 	/**
+	 * Return the currently cached user of the application.
+	 *
+	 * @return Illuminate\Auth\UserInterface|null
+	 */
+	public function getUser()
+	{
+		return $this->user;
+	}
+
+	/**
 	 * Set the current user of the application.
 	 *
 	 * @param  Illuminate\Auth\UserInterface  $user
