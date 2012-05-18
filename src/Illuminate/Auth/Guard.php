@@ -5,6 +5,20 @@ use Illuminate\Session\Store as SessionStore;
 abstract class Guard {
 
 	/**
+	 * The currently authenticated user.
+	 *
+	 * @var UserInterface
+	 */
+	protected $user;
+
+	/**
+	 * The session store used by the guard.
+	 *
+	 * @var Illuminate\Session\Store
+	 */
+	protected $session;
+
+	/**
 	 * Retrieve a user by their unique idenetifier.
 	 *
 	 * @param  mixed  $identifier
@@ -112,6 +126,17 @@ abstract class Guard {
 	public function setSession(SessionStore $session)
 	{
 		$this->session = $session;
+	}
+
+	/**
+	 * Set the current user of the application.
+	 *
+	 * @param  Illuminate\Auth\UserInterface  $user
+	 * @return void
+	 */
+	public function setUser(UserInterface $user)
+	{
+		$this->user = $user;
 	}
 
 	/**

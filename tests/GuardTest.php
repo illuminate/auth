@@ -48,6 +48,25 @@ class GuardTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testIsAuthedReturnsTrueWhenUserIsNotNull()
+	{
+		$user = m::mock('Illuminate\Auth\UserInterface');
+		$mock = $this->getGuard();
+		$mock->setUser($user);
+		$this->assertTrue($mock->isAuthed());
+		$this->assertFalse($mock->isGuest());
+	}
+
+
+	public function testIsAuthedReturnsFalseWhenUserIsNull()
+	{
+		$mock = $this->getGuard('user');
+		$mock->expects($this->exactly(2))->method('user')->will($this->returnValue(null));
+		$this->assertFalse($mock->isAuthed());
+		$this->assertTrue($mock->isGuest());
+	}
+
+
 	protected function getGuard($stub = array())
 	{
 		$stub = array_merge(array('retrieveUserByCredentials', 'retrieveUserByID'), (array) $stub);
