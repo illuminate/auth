@@ -189,4 +189,14 @@ class Guard {
 		return 'login_'.md5(get_class($this));
 	}
 
+	/**
+	 * Get the name of the cookie used to store the "recaller".
+	 *
+	 * @return string
+	 */
+	protected function getRecallerName()
+	{
+		return 'remember_'.md5(get_class($this));
+	}
+
 }
