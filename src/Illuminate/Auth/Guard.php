@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Auth;
 
+use Symfony\Component\HttpFoundation\Request;
 use Illuminate\Session\Store as SessionStore;
 
 class Guard {
@@ -26,14 +27,25 @@ class Guard {
 	protected $session;
 
 	/**
+	 * The Symfony request instance.
+	 *
+	 * @var Symfony\Component\HttpFoundation\Request
+	 */
+	protected $request;
+
+	/**
 	 * Create a new authentication guard.
 	 *
-	 * @param  Illuminate\Auth\UserProviderInterface  $provider
-	 * @param  Illuminate\Session\Store               $session
+	 * @param  Illuminate\Auth\UserProviderInterface     $provider
+	 * @param  Illuminate\Session\Store                  $session
+	 * @param  Symfony\Component\HttpFoundation\Request  $request
 	 * @return void
 	 */
-	public function __construct(UserProviderInterface $provider, SessionStore $session)
+	public function __construct(UserProviderInterface $provider,
+                                SessionStore $session,
+                                Request $request)
 	{
+		$this->request = $request;
 		$this->session = $session;
 		$this->provider = $provider;
 	}
