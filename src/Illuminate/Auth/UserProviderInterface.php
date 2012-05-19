@@ -18,4 +18,13 @@ interface UserProviderInterface {
 	 */
 	public function retrieveByCredentials(array $credentials);
 
+	/**
+	 * Validate a user against the given credentials.
+	 *
+	 * @param  Illuminate\Auth\UserInterface  $user
+	 * @param  array  $credentials
+	 * @return bool
+	 */
+	public function validateCredentials(UserInterface $user, array $credentials);
+
 }

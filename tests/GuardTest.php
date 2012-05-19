@@ -20,10 +20,14 @@ class GuardTest extends PHPUnit_Framework_TestCase {
 
 	public function testAttemptReturnsUserInterface()
 	{
-		$guard = $this->getGuard();
+		$session = m::mock('Illuminate\Session\Store');
+		$provider = m::mock('Illuminate\Auth\UserProviderInterface');
+		$guard = $this->getMock('Illuminate\Auth\Guard', array('login'), array($provider, $session));
 		$user = $this->getMock('Illuminate\Auth\UserInterface');
 		$guard->getProvider()->shouldReceive('retrieveByCredentials')->once()->andReturn($user);
-		$this->assertEquals($user, $guard->attempt(array('foo')));
+		$guard->getProvider()->shouldReceive('validateCredentials')->with($user, array('foo'))->andReturn(true);
+		$guard->expects($this->once())->method('login')->with($this->equalTo($user));
+		$this->assertTrue($guard->attempt(array('foo')));
 	}
 
 

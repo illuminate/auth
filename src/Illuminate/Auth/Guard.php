@@ -85,9 +85,17 @@ class Guard {
 	{
 		$user = $this->provider->retrieveByCredentials($credentials);
 
+		// If an implementation of UserInterface was returned, we'll ask the provider
+		// to validate the user against the given credentials, and if they are in
+		// fact valid we'll log the user into the application and return true.
 		if ($user instanceof UserInterface)
 		{
-			return $user;
+			if ($this->provider->validateCredentials($user, $credentials))
+			{
+				$this->login($user);
+
+				return true;
+			}
 		}
 
 		return false;
