@@ -20,8 +20,8 @@ class GuardTest extends PHPUnit_Framework_TestCase {
 
 	public function testAttemptReturnsUserInterface()
 	{
-		list($session, $provider, $request) = $this->getMocks();
-		$guard = $this->getMock('Illuminate\Auth\Guard', array('login'), array($provider, $session, $request));
+		list($session, $provider, $request, $cookie) = $this->getMocks();
+		$guard = $this->getMock('Illuminate\Auth\Guard', array('login'), array($provider, $session, $cookie, $request));
 		$user = $this->getMock('Illuminate\Auth\UserInterface');
 		$guard->getProvider()->shouldReceive('retrieveByCredentials')->once()->andReturn($user);
 		$guard->getProvider()->shouldReceive('validateCredentials')->with($user, array('foo'))->andReturn(true);
@@ -40,8 +40,8 @@ class GuardTest extends PHPUnit_Framework_TestCase {
 
 	public function testLoginStoresIdentifierInSession()
 	{
-		list($session, $provider, $request) = $this->getMocks();
-		$mock = $this->getMock('Illuminate\Auth\Guard', array('getName'), array($provider, $session, $request));
+		list($session, $provider, $request, $cookie) = $this->getMocks();
+		$mock = $this->getMock('Illuminate\Auth\Guard', array('getName'), array($provider, $session, $cookie, $request));
 		$user = m::mock('Illuminate\Auth\UserInterface');
 		$mock->expects($this->once())->method('getName')->will($this->returnValue('foo'));
 		$user->shouldReceive('getIdentifier')->once()->andReturn('bar');
@@ -62,8 +62,8 @@ class GuardTest extends PHPUnit_Framework_TestCase {
 
 	public function testIsAuthedReturnsFalseWhenUserIsNull()
 	{
-		list($session, $provider, $request) = $this->getMocks();
-		$mock = $this->getMock('Illuminate\Auth\Guard', array('user'), array($provider, $session, $request));
+		list($session, $provider, $request, $cookie) = $this->getMocks();
+		$mock = $this->getMock('Illuminate\Auth\Guard', array('user'), array($provider, $session, $cookie, $request));
 		$mock->expects($this->exactly(2))->method('user')->will($this->returnValue(null));
 		$this->assertFalse($mock->isAuthed());
 		$this->assertTrue($mock->isGuest());
@@ -100,8 +100,8 @@ class GuardTest extends PHPUnit_Framework_TestCase {
 
 	public function testLogoutRemovesSessionToken()
 	{
-		list($session, $provider, $request) = $this->getMocks();
-		$mock = $this->getMock('Illuminate\Auth\Guard', array('getName'), array($provider, $session, $request));
+		list($session, $provider, $request, $cookie) = $this->getMocks();
+		$mock = $this->getMock('Illuminate\Auth\Guard', array('getName'), array($provider, $session, $cookie, $request));
 		$user = m::mock('Illuminate\Auth\UserInterface');
 		$mock->expects($this->once())->method('getName')->will($this->returnValue('foo'));
 		$mock->getSession()->shouldReceive('forget')->once()->with('foo');
@@ -113,8 +113,8 @@ class GuardTest extends PHPUnit_Framework_TestCase {
 
 	protected function getGuard()
 	{
-		list($session, $provider, $request) = $this->getMocks();
-		return new Illuminate\Auth\Guard($provider, $session, $request);
+		list($session, $provider, $request, $cookie) = $this->getMocks();
+		return new Illuminate\Auth\Guard($provider, $session, $cookie, $request);
 	}
 
 
@@ -124,6 +124,7 @@ class GuardTest extends PHPUnit_Framework_TestCase {
 			m::mock('Illuminate\Session\Store'),
 			m::mock('Illuminate\Auth\UserProviderInterface'),
 			m::mock('Symfony\Component\HttpFoundation\Request'),
+			m::mock('Illuminate\CookieCreator'),
 		);
 	}
 

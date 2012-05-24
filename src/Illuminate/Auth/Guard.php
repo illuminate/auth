@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Auth;
 
+use Illuminate\CookieCreator;
 use Symfony\Component\HttpFoundation\Request;
 use Illuminate\Session\Store as SessionStore;
 
@@ -27,6 +28,13 @@ class Guard {
 	protected $session;
 
 	/**
+	 * The Illuminate cookie creator service.
+	 *
+	 * @var Illuminate\CookieCreator
+	 */
+	protected $cookie;
+
+	/**
 	 * The Symfony request instance.
 	 *
 	 * @var Symfony\Component\HttpFoundation\Request
@@ -38,13 +46,16 @@ class Guard {
 	 *
 	 * @param  Illuminate\Auth\UserProviderInterface     $provider
 	 * @param  Illuminate\Session\Store                  $session
+	 * @param  Illuminate\CookieCreator                  $cookie
 	 * @param  Symfony\Component\HttpFoundation\Request  $request
 	 * @return void
 	 */
 	public function __construct(UserProviderInterface $provider,
                                 SessionStore $session,
+                                CookieCreator $cookie,
                                 Request $request)
 	{
+		$this->cookie = $cookie;
 		$this->request = $request;
 		$this->session = $session;
 		$this->provider = $provider;
