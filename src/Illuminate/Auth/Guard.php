@@ -1,5 +1,6 @@
 <?php namespace Illuminate\Auth;
 
+use Illuminate\Encrypter;
 use Illuminate\CookieCreator;
 use Symfony\Component\HttpFoundation\Request;
 use Illuminate\Session\Store as SessionStore;
@@ -40,6 +41,20 @@ class Guard {
 	 * @var Symfony\Component\HttpFoundation\Request
 	 */
 	protected $request;
+
+	/**
+	 * The Illuminate encrypter service.
+	 *
+	 * @var Illuminate\Encrypter
+	 */
+	protected $encrypter;
+
+	/**
+	 * The cookies queued by the guards.
+	 *
+	 * @var array
+	 */
+	protected $queuedCookies = array();
 
 	/**
 	 * Create a new authentication guard.
@@ -102,9 +117,10 @@ class Guard {
 	 * Attempt to authenticate a user using the given credentials.
 	 *
 	 * @param  array  $credentials
+	 * @param  bool   $remember
 	 * @return Illuminate\Auth\UserInterface|false
 	 */
-	public function attempt(array $credentials = array())
+	public function attempt(array $credentials = array(), $remember = false)
 	{
 		$user = $this->provider->retrieveByCredentials($credentials);
 
@@ -115,7 +131,7 @@ class Guard {
 		{
 			if ($this->provider->validateCredentials($user, $credentials))
 			{
-				$this->login($user);
+				$this->login($user, $remember);
 
 				return true;
 			}
@@ -128,13 +144,37 @@ class Guard {
 	 * Log a user into the application.
 	 *
 	 * @param  Illuminate\Auth\UserInterface  $user
+	 * @param  bool  $remember
 	 * @return void
 	 */
-	public function login(UserInterface $user)
+	public function login(UserInterface $user, $remember = false)
 	{
-		$this->session->put($this->getName(), $user->getIdentifier());
+		$id = $user->getIdentifier();
+
+		$this->session->put($this->getName(), $id);
+
+		// If the user should be permanently "remembered" by the application we will
+		// queue a permament cookie that contains the encrypted copy of the user
+		// identifier. We can then decrypt this later to retrieve the user.
+		if ($remember)
+		{
+			$this->queuedCookies[] = $this->createRecaller($id);
+		}
 
 		$this->user = $user;
+	}
+
+	/**
+	 * Create a remember me cookie for a given ID.
+	 *
+	 * @param  mixed  $id
+	 * @return Symfony\Component\HttpFoundation\Cookie
+	 */
+	protected function createRecaller($id)
+	{
+		$value = $this->getEncrypter()->encrypt($id);
+
+		return $this->cookie->forever($this->getRecallerName(), $value);
 	}
 
 	/**
@@ -150,6 +190,32 @@ class Guard {
 	}
 
 	/**
+	 * Get the encrypter instance used by the guard.
+	 *
+	 * @return Illuminate\Encrypter
+	 */
+	public function getEncrypter()
+	{
+		if ( ! isset($this->encrypter))
+		{
+			throw new \RuntimeException("Encrypter has not been set.");
+		}
+
+		return $this->encrypter;
+	}
+
+	/**
+	 * Set the encrypter instance used by the guard.
+	 *
+	 * @param  Illuminate\Encrypter  $encrypter
+	 * @return void
+	 */
+	public function setEncrypter(Encrypter $encrypter)
+	{
+		$this->encrypter = $encrypter;
+	}
+
+	/**
 	 * Get the session store used by the guard.
 	 *
 	 * @return Illuminate\Session\Store
@@ -157,6 +223,16 @@ class Guard {
 	public function getSession()
 	{
 		return $this->session;
+	}
+
+	/**
+	 * Get the cookies queued by the guard.
+	 *
+	 * @return array
+	 */
+	public function getQueuedCookies()
+	{
+		return $this->queuedCookies;
 	}
 
 	/**
@@ -195,7 +271,7 @@ class Guard {
 	 *
 	 * @return string
 	 */
-	protected function getName()
+	public function getName()
 	{
 		return 'login_'.md5(get_class($this));
 	}
@@ -205,7 +281,7 @@ class Guard {
 	 *
 	 * @return string
 	 */
-	protected function getRecallerName()
+	public function getRecallerName()
 	{
 		return 'remember_'.md5(get_class($this));
 	}

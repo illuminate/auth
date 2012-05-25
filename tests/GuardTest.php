@@ -111,6 +111,25 @@ class GuardTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testLoginMethodQueuesCookieWhenRemembering()
+	{
+		list($session, $provider, $request, $cookie) = $this->getMocks();
+		$cookie = new Illuminate\CookieCreator;
+		$guard = new Illuminate\Auth\Guard($provider, $session, $cookie, $request);
+		$encrypter = new Illuminate\Encrypter('MySuperSecretKey');
+		$guard->setEncrypter($encrypter);
+		$guard->getSession()->shouldReceive('put')->once();
+		$user = m::mock('Illuminate\Auth\UserInterface');
+		$user->shouldReceive('getIdentifier')->once()->andReturn('foo bar');
+		$guard->login($user, true);
+
+		$cookies = $guard->getQueuedCookies();
+		$this->assertEquals(1, count($cookies));
+		$this->assertEquals('foo bar', $guard->getEncrypter()->decrypt($cookies[0]->getValue()));
+		$this->assertEquals($cookies[0]->getName(), $guard->getRecallerName());
+	}
+
+
 	protected function getGuard()
 	{
 		list($session, $provider, $request, $cookie) = $this->getMocks();
