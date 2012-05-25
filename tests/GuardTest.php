@@ -130,6 +130,21 @@ class GuardTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testUserUsesRememberCookieIfItExists()
+	{
+		$guard = $this->getGuard();
+		list($session, $provider, $request, $cookie) = $this->getMocks();
+		$encrypter = new Illuminate\Encrypter('foo');
+		$request = Symfony\Component\HttpFoundation\Request::create('/', 'GET', array(), array($guard->getRecallerName() => $encrypter->encrypt(1)));
+		$guard = new Illuminate\Auth\Guard($provider, $session, $cookie, $request);
+		$guard->setEncrypter($encrypter);
+		$guard->getSession()->shouldReceive('get')->once()->andReturn(null);
+		$user = m::mock('Illuminate\Auth\UserInterface');
+		$guard->getProvider()->shouldReceive('retrieveByID')->once()->with(1)->andReturn($user);
+		$this->assertEquals($user, $guard->user());
+	}
+
+
 	protected function getGuard()
 	{
 		list($session, $provider, $request, $cookie) = $this->getMocks();
