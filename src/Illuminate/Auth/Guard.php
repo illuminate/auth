@@ -107,9 +107,36 @@ class Guard {
 
 		$id = $this->session->get($this->getName());
 
+		$user = null;
+
+		// First we will try to load the user using the identifier in the session if
+		// one exists. Otherwise we will check for a "remember me" cookie in the
+		// request, and if it exists, attempt to retrieve the user with that.
 		if ( ! is_null($id))
 		{
-			return $this->user = $this->provider->retrieveByID($id);
+			$user = $this->provider->retrieveByID($id);
+		}
+
+		if (is_null($user) and ! is_null($recaller = $this->getRecaller()))
+		{
+			$user = $this->provider->retrieveByID($recaller);
+		}
+
+		return $this->user = $user;
+	}
+
+	/**
+	 * Get the decrypted recaller cookie for the request.
+	 *
+	 * @return string|null
+	 */
+	protected function getRecaller()
+	{
+		$recaller = $this->request->cookies->get($this->getRecallerName());
+
+		if ( ! is_null($recaller))
+		{
+			return $this->getEncrypter()->decrypt($recaller);
 		}
 	}
 

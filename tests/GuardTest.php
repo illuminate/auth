@@ -142,7 +142,7 @@ class GuardTest extends PHPUnit_Framework_TestCase {
 		return array(
 			m::mock('Illuminate\Session\Store'),
 			m::mock('Illuminate\Auth\UserProviderInterface'),
-			m::mock('Symfony\Component\HttpFoundation\Request'),
+			Symfony\Component\HttpFoundation\Request::create('/', 'GET'),
 			m::mock('Illuminate\CookieCreator'),
 		);
 	}
