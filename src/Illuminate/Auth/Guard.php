@@ -61,16 +61,13 @@ class Guard {
 	 *
 	 * @param  Illuminate\Auth\UserProviderInterface     $provider
 	 * @param  Illuminate\Session\Store                  $session
-	 * @param  Illuminate\CookieCreator                  $cookie
 	 * @param  Symfony\Component\HttpFoundation\Request  $request
 	 * @return void
 	 */
 	public function __construct(UserProviderInterface $provider,
                                 SessionStore $session,
-                                CookieCreator $cookie,
                                 Request $request)
 	{
-		$this->cookie = $cookie;
 		$this->request = $request;
 		$this->session = $session;
 		$this->provider = $provider;
@@ -201,7 +198,7 @@ class Guard {
 	{
 		$value = $this->getEncrypter()->encrypt($id);
 
-		return $this->cookie->forever($this->getRecallerName(), $value);
+		return $this->getCookieCreator()->forever($this->getRecallerName(), $value);
 	}
 
 	/**
@@ -240,6 +237,32 @@ class Guard {
 	public function setEncrypter(Encrypter $encrypter)
 	{
 		$this->encrypter = $encrypter;
+	}
+
+	/**
+	 * Get the cookie creator instance used by the guard.
+	 *
+	 * @return Illuminate\CookieCreator
+	 */
+	public function getCookieCreator()
+	{
+		if ( ! isset($this->cookie))
+		{
+			throw new \RuntimeException("Cookie creator has not been set.");
+		}
+
+		return $this->cookie;
+	}
+
+	/**
+	 * Set the cookie creator instance used by the guard.
+	 *
+	 * @param  Illuminate\CookieCreator  $cookie
+	 * @return void
+	 */
+	public function setCookieCreator(CookieCreator $cookie)
+	{
+		$this->cookie = $cookie;
 	}
 
 	/**
