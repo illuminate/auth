@@ -59,8 +59,8 @@ class Guard {
 	/**
 	 * Create a new authentication guard.
 	 *
-	 * @param  Illuminate\Auth\UserProviderInterface     $provider
-	 * @param  Illuminate\Session\Store                  $session
+	 * @param  Illuminate\Auth\UserProviderInterface  $provider
+	 * @param  Illuminate\Session\Store  $session
 	 * @param  Symfony\Component\HttpFoundation\Request  $request
 	 * @return void
 	 */
@@ -179,7 +179,7 @@ class Guard {
 
 		// If the user should be permanently "remembered" by the application we will
 		// queue a permament cookie that contains the encrypted copy of the user
-		// identifier. We can then decrypt this later to retrieve the user.
+		// identifier. We will then decrypt this later to retrieve the users.
 		if ($remember)
 		{
 			$this->queuedCookies[] = $this->createRecaller($id);

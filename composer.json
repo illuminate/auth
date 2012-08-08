@@ -19,5 +19,6 @@
     },
     "autoload": {
         "psr-0": {"Illuminate\\Auth": "src/"}
-    }
+    },
+    "minimum-stability": "dev"
 }
