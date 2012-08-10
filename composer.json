@@ -11,10 +11,12 @@
         "php": ">=5.3.0",
         "illuminate/cookie": ">=1.0.0",
         "illuminate/encryption": ">=1.0.0",
+        "illuminate/hashing": ">=1.0.0",
         "illuminate/session": ">=1.0.0",
         "symfony/http-foundation": ">=2.0.0"
     },
     "require-dev": {
+        "illuminate/database": ">=1.0.0",
         "mockery/mockery": ">=0.7.2"
     },
     "autoload": {
