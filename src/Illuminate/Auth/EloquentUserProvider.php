@@ -74,7 +74,7 @@ class EloquentUserProvider implements UserProviderInterface {
 	{
 		$plain = $credentials['password'];
 
-		return $this->hasher->check($plain, $user->password);
+		return $this->hasher->check($plain, $user->getPassword());
 	}
 
 	/**
@@ -82,7 +82,7 @@ class EloquentUserProvider implements UserProviderInterface {
 	 *
 	 * @return Illuminate\Database\Eloquent\Model
 	 */
-	protected function createModel()
+	public function createModel()
 	{
 		$class = '\\'.ltrim($this->model, '\\');
 

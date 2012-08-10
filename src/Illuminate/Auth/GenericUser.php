@@ -31,6 +31,16 @@ class GenericUser implements UserInterface {
 	}
 
 	/**
+	 * Get the password for the user.
+	 *
+	 * @return string
+	 */
+	public function getPassword()
+	{
+		return $this->attributes['password'];
+	}
+
+	/**
 	 * Dynamically access the user's attributes.
 	 *
 	 * @param  string  $key

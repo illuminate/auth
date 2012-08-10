@@ -9,4 +9,11 @@ interface UserInterface {
 	 */
 	public function getIdentifier();
 
+	/**
+	 * Get the password for the user.
+	 *
+	 * @return string
+	 */
+	public function getPassword();
+
 }
