@@ -46,7 +46,7 @@ class DatabaseUserProviderTest extends PHPUnit_Framework_TestCase {
 		$conn->shouldReceive('first')->once()->andReturn(array('id' => 1, 'name' => 'taylor'));
 		$hasher = m::mock('Illuminate\Hashing\HasherInterface');
 		$provider = new Illuminate\Auth\DatabaseUserProvider($conn, $hasher, 'foo');
-		$user = $provider->retrieveByCredentials(array('username' => 'dayle'));
+		$user = $provider->retrieveByCredentials(array('username' => 'dayle', 'password' => 'foo'));
 
 		$this->assertInstanceOf('Illuminate\Auth\GenericUser', $user);
 		$this->assertEquals(1, $user->getIdentifier());

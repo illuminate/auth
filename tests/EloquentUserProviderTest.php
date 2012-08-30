@@ -31,7 +31,7 @@ class EloquentUserProviderTest extends PHPUnit_Framework_TestCase {
 		$mock->shouldReceive('where')->once()->with('username', 'dayle');
 		$mock->shouldReceive('first')->once()->andReturn('bar');
 		$provider->expects($this->once())->method('createModel')->will($this->returnValue($mock));
-		$user = $provider->retrieveByCredentials(array('username' => 'dayle'));
+		$user = $provider->retrieveByCredentials(array('username' => 'dayle', 'password' => 'foo'));
 
 		$this->assertEquals('bar', $user);
 	}
