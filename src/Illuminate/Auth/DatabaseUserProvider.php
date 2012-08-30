@@ -97,7 +97,7 @@ class DatabaseUserProvider implements UserProviderInterface {
 	{
 		$plain = $credentials['password'];
 
-		return $this->hasher->check($plain, $user->getPassword());
+		return $this->hasher->check($plain, $user->getAuthPassword());
 	}
 
 }

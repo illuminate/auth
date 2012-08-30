@@ -44,7 +44,7 @@ class GuardTest extends PHPUnit_Framework_TestCase {
 		$mock = $this->getMock('Illuminate\Auth\Guard', array('getName'), array($provider, $session, $request));
 		$user = m::mock('Illuminate\Auth\UserInterface');
 		$mock->expects($this->once())->method('getName')->will($this->returnValue('foo'));
-		$user->shouldReceive('getIdentifier')->once()->andReturn('bar');
+		$user->shouldReceive('getAuthIdentifier')->once()->andReturn('bar');
 		$mock->getSession()->shouldReceive('put')->with('foo', 'bar')->once();
 		$mock->login($user);
 	}
@@ -121,7 +121,7 @@ class GuardTest extends PHPUnit_Framework_TestCase {
 		$guard->setEncrypter($encrypter);
 		$guard->getSession()->shouldReceive('put')->once();
 		$user = m::mock('Illuminate\Auth\UserInterface');
-		$user->shouldReceive('getIdentifier')->once()->andReturn('foo bar');
+		$user->shouldReceive('getAuthIdentifier')->once()->andReturn('foo bar');
 		$guard->login($user, true);
 
 		$cookies = $guard->getQueuedCookies();

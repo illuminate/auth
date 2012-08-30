@@ -173,7 +173,7 @@ class Guard {
 	 */
 	public function login(UserInterface $user, $remember = false)
 	{
-		$id = $user->getIdentifier();
+		$id = $user->getAuthIdentifier();
 
 		$this->session->put($this->getName(), $id);
 

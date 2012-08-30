@@ -7,13 +7,13 @@ interface UserInterface {
 	 *
 	 * @return mixed
 	 */
-	public function getIdentifier();
+	public function getAuthIdentifier();
 
 	/**
 	 * Get the password for the user.
 	 *
 	 * @return string
 	 */
-	public function getPassword();
+	public function getAuthPassword();
 
 }

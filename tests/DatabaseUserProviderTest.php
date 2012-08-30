@@ -20,7 +20,7 @@ class DatabaseUserProviderTest extends PHPUnit_Framework_TestCase {
 		$user = $provider->retrieveByID(1);
 
 		$this->assertInstanceOf('Illuminate\Auth\GenericUser', $user);
-		$this->assertEquals(1, $user->getIdentifier());
+		$this->assertEquals(1, $user->getAuthIdentifier());
 		$this->assertEquals('Dayle', $user->name);
 	}
 
@@ -49,7 +49,7 @@ class DatabaseUserProviderTest extends PHPUnit_Framework_TestCase {
 		$user = $provider->retrieveByCredentials(array('username' => 'dayle', 'password' => 'foo'));
 
 		$this->assertInstanceOf('Illuminate\Auth\GenericUser', $user);
-		$this->assertEquals(1, $user->getIdentifier());
+		$this->assertEquals(1, $user->getAuthIdentifier());
 		$this->assertEquals('taylor', $user->name);
 	}
 
@@ -75,7 +75,7 @@ class DatabaseUserProviderTest extends PHPUnit_Framework_TestCase {
 		$hasher->shouldReceive('check')->once()->with('plain', 'hash')->andReturn(true);
 		$provider = new Illuminate\Auth\DatabaseUserProvider($conn, $hasher, 'foo');
 		$user = m::mock('Illuminate\Auth\UserInterface');
-		$user->shouldReceive('getPassword')->once()->andReturn('hash');
+		$user->shouldReceive('getAuthPassword')->once()->andReturn('hash');
 		$result = $provider->validateCredentials($user, array('password' => 'plain'));
 
 		$this->assertTrue($result);

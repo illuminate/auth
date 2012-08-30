@@ -25,7 +25,7 @@ class GenericUser implements UserInterface {
 	 *
 	 * @return mixed
 	 */
-	public function getIdentifier()
+	public function getAuthIdentifier()
 	{
 		return $this->attributes['id'];
 	}
@@ -35,7 +35,7 @@ class GenericUser implements UserInterface {
 	 *
 	 * @return string
 	 */
-	public function getPassword()
+	public function getAuthPassword()
 	{
 		return $this->attributes['password'];
 	}
