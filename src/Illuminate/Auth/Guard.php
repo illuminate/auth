@@ -1,7 +1,7 @@
 <?php namespace Illuminate\Auth;
 
 use Illuminate\Encrypter;
-use Illuminate\CookieCreator;
+use Illuminate\CookieJar;
 use Symfony\Component\HttpFoundation\Request;
 use Illuminate\Session\Store as SessionStore;
 
@@ -31,7 +31,7 @@ class Guard {
 	/**
 	 * The Illuminate cookie creator service.
 	 *
-	 * @var Illuminate\CookieCreator
+	 * @var Illuminate\CookieJar
 	 */
 	protected $cookie;
 
@@ -198,7 +198,7 @@ class Guard {
 	{
 		$value = $this->getEncrypter()->encrypt($id);
 
-		return $this->getCookieCreator()->forever($this->getRecallerName(), $value);
+		return $this->getCookieJar()->forever($this->getRecallerName(), $value);
 	}
 
 	/**
@@ -242,13 +242,13 @@ class Guard {
 	/**
 	 * Get the cookie creator instance used by the guard.
 	 *
-	 * @return Illuminate\CookieCreator
+	 * @return Illuminate\CookieJar
 	 */
-	public function getCookieCreator()
+	public function getCookieJar()
 	{
 		if ( ! isset($this->cookie))
 		{
-			throw new \RuntimeException("Cookie creator has not been set.");
+			throw new \RuntimeException("Cookie jar has not been set.");
 		}
 
 		return $this->cookie;
@@ -257,10 +257,10 @@ class Guard {
 	/**
 	 * Set the cookie creator instance used by the guard.
 	 *
-	 * @param  Illuminate\CookieCreator  $cookie
+	 * @param  Illuminate\CookieJar  $cookie
 	 * @return void
 	 */
-	public function setCookieCreator(CookieCreator $cookie)
+	public function setCookieJar(CookieJar $cookie)
 	{
 		$this->cookie = $cookie;
 	}

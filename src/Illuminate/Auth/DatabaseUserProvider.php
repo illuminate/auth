@@ -72,7 +72,10 @@ class DatabaseUserProvider implements UserProviderInterface {
 
 		foreach ($credentials as $key => $value)
 		{
-			if ( ! str_contains($key, 'password')) $query->where($key, $value);
+			if ( ! str_contains($key, 'password'))
+			{
+				$query->where($key, $value);
+			}
 		}
 
 		// Now we are ready to execute the query to see if we have an user matching

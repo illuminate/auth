@@ -1,6 +1,7 @@
 <?php
 
 use Mockery as m;
+use Symfony\Component\HttpFoundation\Request;
 
 class GuardTest extends PHPUnit_Framework_TestCase {
 
@@ -114,9 +115,9 @@ class GuardTest extends PHPUnit_Framework_TestCase {
 	public function testLoginMethodQueuesCookieWhenRemembering()
 	{
 		list($session, $provider, $request, $cookie) = $this->getMocks();
-		$cookie = new Illuminate\CookieCreator;
+		$cookie = $this->getCookieJar();
 		$guard = new Illuminate\Auth\Guard($provider, $session, $request);
-		$guard->setCookieCreator($cookie);
+		$guard->setCookieJar($cookie);
 		$encrypter = new Illuminate\Encrypter('MySuperSecretKey');
 		$guard->setEncrypter($encrypter);
 		$guard->getSession()->shouldReceive('put')->once();
@@ -126,7 +127,7 @@ class GuardTest extends PHPUnit_Framework_TestCase {
 
 		$cookies = $guard->getQueuedCookies();
 		$this->assertEquals(1, count($cookies));
-		$this->assertEquals('foo bar', $guard->getEncrypter()->decrypt($cookies[0]->getValue()));
+		$this->assertEquals('foo bar', $guard->getEncrypter()->decrypt($cookie->parse($cookies[0]->getValue())));
 		$this->assertEquals($cookies[0]->getName(), $guard->getRecallerName());
 	}
 
@@ -138,7 +139,7 @@ class GuardTest extends PHPUnit_Framework_TestCase {
 		$encrypter = new Illuminate\Encrypter('foo');
 		$request = Symfony\Component\HttpFoundation\Request::create('/', 'GET', array(), array($guard->getRecallerName() => $encrypter->encrypt(1)));
 		$guard = new Illuminate\Auth\Guard($provider, $session, $request);
-		$guard->setCookieCreator($cookie);
+		$guard->setCookieJar($cookie);
 		$guard->setEncrypter($encrypter);
 		$guard->getSession()->shouldReceive('get')->once()->andReturn(null);
 		$user = m::mock('Illuminate\Auth\UserInterface');
@@ -160,8 +161,14 @@ class GuardTest extends PHPUnit_Framework_TestCase {
 			m::mock('Illuminate\Session\Store'),
 			m::mock('Illuminate\Auth\UserProviderInterface'),
 			Symfony\Component\HttpFoundation\Request::create('/', 'GET'),
-			m::mock('Illuminate\CookieCreator'),
+			m::mock('Illuminate\CookieJar'),
 		);
+	}
+
+
+	protected function getCookieJar()
+	{
+		return new Illuminate\CookieJar(Request::create('/foo', 'GET'), 'foo-bar', array('domain' => 'foo.com', 'path' => '/', 'secure' => false, 'httpOnly' => false));
 	}
 
 }
