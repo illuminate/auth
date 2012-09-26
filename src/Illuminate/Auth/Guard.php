@@ -36,13 +36,6 @@ class Guard {
 	protected $cookie;
 
 	/**
-	 * The Symfony request instance.
-	 *
-	 * @var Symfony\Component\HttpFoundation\Request
-	 */
-	protected $request;
-
-	/**
 	 * The Illuminate encrypter service.
 	 *
 	 * @var Illuminate\Encrypter
@@ -61,14 +54,11 @@ class Guard {
 	 *
 	 * @param  Illuminate\Auth\UserProviderInterface  $provider
 	 * @param  Illuminate\Session\Store  $session
-	 * @param  Symfony\Component\HttpFoundation\Request  $request
 	 * @return void
 	 */
 	public function __construct(UserProviderInterface $provider,
-                                SessionStore $session,
-                                Request $request)
+                                SessionStore $session)
 	{
-		$this->request = $request;
 		$this->session = $session;
 		$this->provider = $provider;
 	}
@@ -129,7 +119,7 @@ class Guard {
 	 */
 	protected function getRecaller()
 	{
-		$recaller = $this->request->cookies->get($this->getRecallerName());
+		$recaller = $this->getCookieJar()->get($this->getRecallerName());
 
 		if ( ! is_null($recaller))
 		{

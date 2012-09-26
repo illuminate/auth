@@ -83,6 +83,8 @@ class GuardTest extends PHPUnit_Framework_TestCase {
 	public function testNullIsReturnedForUserIfNoUserFound()
 	{
 		$mock = $this->getGuard();
+		$mock->setCookieJar($cookies = m::mock('Illuminate\CookieJar'));
+		$cookies->shouldReceive('get')->once()->andReturn(null);
 		$mock->getSession()->shouldReceive('get')->once()->andReturn(null);
 		$this->assertNull($mock->user());
 	}
@@ -140,6 +142,7 @@ class GuardTest extends PHPUnit_Framework_TestCase {
 		$request = Symfony\Component\HttpFoundation\Request::create('/', 'GET', array(), array($guard->getRecallerName() => $encrypter->encrypt(1)));
 		$guard = new Illuminate\Auth\Guard($provider, $session, $request);
 		$guard->setCookieJar($cookie);
+		$cookie->shouldReceive('get')->once()->andReturn($encrypter->encrypt(1));
 		$guard->setEncrypter($encrypter);
 		$guard->getSession()->shouldReceive('get')->once()->andReturn(null);
 		$user = m::mock('Illuminate\Auth\UserInterface');
