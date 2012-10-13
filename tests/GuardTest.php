@@ -117,19 +117,18 @@ class GuardTest extends PHPUnit_Framework_TestCase {
 	public function testLoginMethodQueuesCookieWhenRemembering()
 	{
 		list($session, $provider, $request, $cookie) = $this->getMocks();
-		$cookie = $this->getCookieJar();
+		$cookie = m::mock('Illuminate\CookieJar');
 		$guard = new Illuminate\Auth\Guard($provider, $session, $request);
 		$guard->setCookieJar($cookie);
-		$encrypter = new Illuminate\Encrypter('MySuperSecretKey');
-		$guard->setEncrypter($encrypter);
-		$guard->getSession()->shouldReceive('put')->once();
+		$cookie->shouldReceive('forever')->once()->with($guard->getRecallerName(), 'foo')->andReturn(new Symfony\Component\HttpFoundation\Cookie($guard->getRecallerName(), 'foo'));
+		$guard->getSession()->shouldReceive('put')->once()->with($guard->getName(), 'foo');
 		$user = m::mock('Illuminate\Auth\UserInterface');
-		$user->shouldReceive('getAuthIdentifier')->once()->andReturn('foo bar');
+		$user->shouldReceive('getAuthIdentifier')->once()->andReturn('foo');
 		$guard->login($user, true);
 
 		$cookies = $guard->getQueuedCookies();
 		$this->assertEquals(1, count($cookies));
-		$this->assertEquals('foo bar', $guard->getEncrypter()->decrypt($cookie->parse($cookies[0]->getValue())));
+		$this->assertEquals('foo', $cookies[0]->getValue());
 		$this->assertEquals($cookies[0]->getName(), $guard->getRecallerName());
 	}
 
@@ -138,15 +137,14 @@ class GuardTest extends PHPUnit_Framework_TestCase {
 	{
 		$guard = $this->getGuard();
 		list($session, $provider, $request, $cookie) = $this->getMocks();
-		$encrypter = new Illuminate\Encrypter('foo');
-		$request = Symfony\Component\HttpFoundation\Request::create('/', 'GET', array(), array($guard->getRecallerName() => $encrypter->encrypt(1)));
+		$request = Symfony\Component\HttpFoundation\Request::create('/', 'GET', array(), array($guard->getRecallerName() => 'recaller'));
 		$guard = new Illuminate\Auth\Guard($provider, $session, $request);
+		$cookie = m::mock('Illuminate\CookieJar');
 		$guard->setCookieJar($cookie);
-		$cookie->shouldReceive('get')->once()->andReturn($encrypter->encrypt(1));
-		$guard->setEncrypter($encrypter);
-		$guard->getSession()->shouldReceive('get')->once()->andReturn(null);
+		$cookie->shouldReceive('get')->once()->with($guard->getRecallerName())->andReturn('recaller');
+		$guard->getSession()->shouldReceive('get')->once()->with($guard->getName())->andReturn(null);
 		$user = m::mock('Illuminate\Auth\UserInterface');
-		$guard->getProvider()->shouldReceive('retrieveByID')->once()->with(1)->andReturn($user);
+		$guard->getProvider()->shouldReceive('retrieveByID')->once()->with('recaller')->andReturn($user);
 		$this->assertEquals($user, $guard->user());
 	}
 
@@ -171,7 +169,7 @@ class GuardTest extends PHPUnit_Framework_TestCase {
 
 	protected function getCookieJar()
 	{
-		return new Illuminate\CookieJar(Request::create('/foo', 'GET'), 'foo-bar', array('domain' => 'foo.com', 'path' => '/', 'secure' => false, 'httpOnly' => false));
+		return new Illuminate\CookieJar(Request::create('/foo', 'GET'), m::mock('Illuminate\Encrypter'), array('domain' => 'foo.com', 'path' => '/', 'secure' => false, 'httpOnly' => false));
 	}
 
 }

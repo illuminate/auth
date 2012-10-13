@@ -36,13 +36,6 @@ class Guard {
 	protected $cookie;
 
 	/**
-	 * The Illuminate encrypter service.
-	 *
-	 * @var Illuminate\Encrypter
-	 */
-	protected $encrypter;
-
-	/**
 	 * The cookies queued by the guards.
 	 *
 	 * @var array
@@ -97,8 +90,8 @@ class Guard {
 		$user = null;
 
 		// First we will try to load the user using the identifier in the session if
-		// one exists. Otherwise we will check for a "remember me" cookie in the
-		// request, and if it exists, attempt to retrieve the user with that.
+		// one exists. Otherwise we will check for a "remember me" cookie in this
+		// request, and if one exists, attempt to retrieve the user using that.
 		if ( ! is_null($id))
 		{
 			$user = $this->provider->retrieveByID($id);
@@ -119,12 +112,7 @@ class Guard {
 	 */
 	protected function getRecaller()
 	{
-		$recaller = $this->getCookieJar()->get($this->getRecallerName());
-
-		if ( ! is_null($recaller))
-		{
-			return $this->getEncrypter()->decrypt($recaller);
-		}
+		return $this->getCookieJar()->get($this->getRecallerName());
 	}
 
 	/**
@@ -186,9 +174,7 @@ class Guard {
 	 */
 	protected function createRecaller($id)
 	{
-		$value = $this->getEncrypter()->encrypt($id);
-
-		return $this->getCookieJar()->forever($this->getRecallerName(), $value);
+		return $this->getCookieJar()->forever($this->getRecallerName(), $id);
 	}
 
 	/**
@@ -201,32 +187,6 @@ class Guard {
 		$this->session->forget($this->getName());
 
 		$this->user = null;
-	}
-
-	/**
-	 * Get the encrypter instance used by the guard.
-	 *
-	 * @return Illuminate\Encrypter
-	 */
-	public function getEncrypter()
-	{
-		if ( ! isset($this->encrypter))
-		{
-			throw new \RuntimeException("Encrypter has not been set.");
-		}
-
-		return $this->encrypter;
-	}
-
-	/**
-	 * Set the encrypter instance used by the guard.
-	 *
-	 * @param  Illuminate\Encrypter  $encrypter
-	 * @return void
-	 */
-	public function setEncrypter(Encrypter $encrypter)
-	{
-		$this->encrypter = $encrypter;
 	}
 
 	/**
