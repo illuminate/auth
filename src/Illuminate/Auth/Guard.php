@@ -178,6 +178,16 @@ class Guard {
 	}
 
 	/**
+	 * Remove a remember me cookie
+	 *
+	 * @return Symfony\Component\HttpFoundation\Cookie
+	 */
+	protected function forgetRecaller()
+	{
+		return $this->getCookieJar()->forget($this->getRecallerName());
+	}
+
+	/**
 	 * Log the user out of the application.
 	 *
 	 * @return void
@@ -185,6 +195,8 @@ class Guard {
 	public function logout()
 	{
 		$this->session->forget($this->getName());
+		
+		$this->queuedCookies[] = $this->forgetRecaller();
 
 		$this->user = null;
 	}

@@ -105,6 +105,7 @@ class GuardTest extends PHPUnit_Framework_TestCase {
 	{
 		list($session, $provider, $request, $cookie) = $this->getMocks();
 		$mock = $this->getMock('Illuminate\Auth\Guard', array('getName'), array($provider, $session, $request));
+		$mock->setCookieJar($cookies = m::mock('Illuminate\CookieJar'));
 		$user = m::mock('Illuminate\Auth\UserInterface');
 		$mock->expects($this->once())->method('getName')->will($this->returnValue('foo'));
 		$mock->getSession()->shouldReceive('forget')->once()->with('foo');
