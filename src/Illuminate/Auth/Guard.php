@@ -186,6 +186,10 @@ class Guard {
 	{
 		$this->session->forget($this->getName());
 
+		$recaller = $this->getRecallerName();
+
+		$this->queuedCookies[] = $this->getCookieJar()->forget($recaller);
+
 		$this->user = null;
 	}
 

@@ -101,12 +101,15 @@ class GuardTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testLogoutRemovesSessionToken()
+	public function testLogoutRemovesSessionTokenAndRememberMeCookie()
 	{
 		list($session, $provider, $request, $cookie) = $this->getMocks();
-		$mock = $this->getMock('Illuminate\Auth\Guard', array('getName'), array($provider, $session, $request));
+		$mock = $this->getMock('Illuminate\Auth\Guard', array('getName', 'getRecallerName'), array($provider, $session, $request));
+		$mock->setCookieJar($cookies = m::mock('Illuminate\CookieJar'));
 		$user = m::mock('Illuminate\Auth\UserInterface');
 		$mock->expects($this->once())->method('getName')->will($this->returnValue('foo'));
+		$mock->expects($this->once())->method('getRecallerName')->will($this->returnValue('bar'));
+		$cookies->shouldReceive('forget')->once()->with('bar');
 		$mock->getSession()->shouldReceive('forget')->once()->with('foo');
 		$mock->setUser($user);
 		$mock->logout();
