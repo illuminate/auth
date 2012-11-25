@@ -7,36 +7,33 @@ class AuthServiceProvider extends ServiceProvider {
 	/**
 	 * Bootstrap the application events.
 	 *
-	 * @param  Illuminate\Foundation\Application  $app
 	 * @return void
 	 */
-	public function boot($app)
+	public function boot()
 	{
-		$this->registerAuthEvents($app);
+		$this->registerAuthEvents();
 	}
 
 	/**
 	 * Register the service provider.
 	 *
-	 * @param  Illuminate\Foundation\Application  $app
 	 * @return void
 	 */
-	public function register($app)
+	public function register()
 	{
-		$this->registerAuthProvider($app);
+		$this->registerAuthProvider();
 
-		$this->registerAuthFilter($app);
+		$this->registerAuthFilter();
 	}
 
 	/**
 	 * Register the authentication provider.
 	 *
-	 * @param  Illuminate\Foundation\Application  $app
 	 * @return void
 	 */
-	protected function registerAuthProvider($app)
+	protected function registerAuthProvider()
 	{
-		$app['auth'] = $app->share(function($app)
+		$this->app['auth'] = $this->app->share(function($app)
 		{
 			// Once the authentication service has actually been requested by the developer
 			// we will set a variable in the application indicating such. This helps us
@@ -50,11 +47,12 @@ class AuthServiceProvider extends ServiceProvider {
 	/**
 	 * Register the events needed for authentication.
 	 *
-	 * @param  Illuminate\Foundation\Application  $app
 	 * @return void
 	 */
-	protected function registerAuthEvents($app)
+	protected function registerAuthEvents()
 	{
+		$app = $this->app;
+
 		$app->after(function($request, $response) use ($app)
 		{
 			// If the authentication service has been used, we'll check for any cookies
@@ -76,11 +74,12 @@ class AuthServiceProvider extends ServiceProvider {
 	/**
 	 * Register the filter for the auth library.
 	 *
-	 * @param  Illuminate\Foundation\Application  $app
 	 * @return void
 	 */
-	protected function registerAuthFilter($app)
+	protected function registerAuthFilter()
 	{
+		$app = $this->app;
+
 		// The "auth" middleware provides a convenient way to verify that a given
 		// user is logged into the application. If they are not, we will just
 		// redirect the users to the "login" named route as a convenience.
