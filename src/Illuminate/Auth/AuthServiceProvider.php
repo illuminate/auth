@@ -83,7 +83,7 @@ class AuthServiceProvider extends ServiceProvider {
 		// The "auth" middleware provides a convenient way to verify that a given
 		// user is logged into the application. If they are not, we will just
 		// redirect the users to the "login" named route as a convenience.
-		$app->addFilter('auth', function() use ($app)
+		$app['router']->addFilter('auth', function() use ($app)
 		{
 			if ($app['auth']->isGuest())
 			{
