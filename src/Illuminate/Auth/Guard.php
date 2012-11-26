@@ -61,7 +61,7 @@ class Guard {
 	 *
 	 * @return bool
 	 */
-	public function isAuthed()
+	public function check()
 	{
 		return ! is_null($this->user());
 	}
@@ -71,7 +71,7 @@ class Guard {
 	 *
 	 * @return bool
 	 */
-	public function isGuest()
+	public function guest()
 	{
 		return is_null($this->user());
 	}

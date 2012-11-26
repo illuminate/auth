@@ -56,8 +56,8 @@ class GuardTest extends PHPUnit_Framework_TestCase {
 		$user = m::mock('Illuminate\Auth\UserInterface');
 		$mock = $this->getGuard();
 		$mock->setUser($user);
-		$this->assertTrue($mock->isAuthed());
-		$this->assertFalse($mock->isGuest());
+		$this->assertTrue($mock->check());
+		$this->assertFalse($mock->guest());
 	}
 
 
@@ -66,8 +66,8 @@ class GuardTest extends PHPUnit_Framework_TestCase {
 		list($session, $provider, $request, $cookie) = $this->getMocks();
 		$mock = $this->getMock('Illuminate\Auth\Guard', array('user'), array($provider, $session, $request));
 		$mock->expects($this->exactly(2))->method('user')->will($this->returnValue(null));
-		$this->assertFalse($mock->isAuthed());
-		$this->assertTrue($mock->isGuest());
+		$this->assertFalse($mock->check());
+		$this->assertTrue($mock->guest());
 	}
 
 
