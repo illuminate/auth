@@ -5,6 +5,13 @@ use Illuminate\Support\ServiceProvider;
 class AuthServiceProvider extends ServiceProvider {
 
 	/**
+	 * Indicates if loading of the provider is deferred.
+	 *
+	 * @var bool
+	 */
+	protected $defer = true;
+
+	/**
 	 * Bootstrap the application events.
 	 *
 	 * @return void
@@ -57,6 +64,16 @@ class AuthServiceProvider extends ServiceProvider {
 				}
 			}
 		});
+	}
+
+	/**
+	 * Get the services provided by the provider.
+	 *
+	 * @return array
+	 */
+	public function provides()
+	{
+		return array('auth');
 	}
 
 }
