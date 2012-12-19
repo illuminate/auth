@@ -120,7 +120,7 @@ class Guard {
 	 *
 	 * @param  array  $credentials
 	 * @param  bool   $remember
-	 * @return Illuminate\Auth\UserInterface|false
+	 * @return bool
 	 */
 	public function attempt(array $credentials = array(), $remember = false)
 	{
