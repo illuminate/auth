@@ -14,7 +14,7 @@
         "illuminate/hashing": "1.2.*",
         "illuminate/session": "1.2.*",
         "illuminate/support": "1.2.*",
-        "symfony/http-foundation": "2.1.*"
+        "symfony/http-foundation": "2.2.*"
     },
     "require-dev": {
         "illuminate/database": "1.2.*",
