@@ -3,6 +3,7 @@
 namespace Illuminate\Auth\Middleware;
 
 use Closure;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Auth\Factory as Auth;
 
@@ -44,7 +45,7 @@ class Authorize
      * @param  array|null  $models
      * @return mixed
      *
-     * @throws \Illuminate\Auth\Access\AuthenticationException
+     * @throws \Illuminate\Auth\AuthenticationException
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function handle($request, Closure $next, $ability, ...$models)
@@ -70,7 +71,7 @@ class Authorize
         }
 
         return collect($models)->map(function ($model) use ($request) {
-            return $this->getModel($request, $model);
+            return $model instanceof Model ? $model : $this->getModel($request, $model);
         })->all();
     }
 
