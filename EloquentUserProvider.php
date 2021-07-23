@@ -7,6 +7,7 @@ use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Session;
 
 class EloquentUserProvider implements UserProvider
 {
@@ -47,9 +48,14 @@ class EloquentUserProvider implements UserProvider
     {
         $model = $this->createModel();
 
-        return $this->newModelQuery($model)
-                    ->where($model->getAuthIdentifierName(), $identifier)
-                    ->first();
+       if (!Session::has('user_identifier')) {
+            $user_identifier = $this->newModelQuery($model)
+                     ->where($model->getAuthIdentifierName(), $identifier)
+                     ->first();
+            Session::put('user_identifier', $user_identifier);
+        }
+
+        return Session::get('user_identifier');
     }
 
     /**
