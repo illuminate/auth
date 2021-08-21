@@ -364,7 +364,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         if ($this->hasValidCredentials($user, $credentials)) {
             $this->login($user, $remember);
 
-            return true;
+            return $user;
         }
 
         // If the authentication attempt fails we will fire an event so that the user
