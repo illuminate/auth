@@ -11,7 +11,7 @@ class AuthManager implements FactoryContract
     use CreatesUserProviders;
 
     /**
-     * The application instance.
+     * The application instance
      *
      * @var \Illuminate\Contracts\Foundation\Application
      */
